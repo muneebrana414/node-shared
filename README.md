@@ -79,4 +79,44 @@ app.listen(port, () => {
 
 ---
 
+## Publishing Events
+Microservices can publish events to AWS EventBridge using the `AWSEventBridgeBus` class from the shared library. Below is an example of how to publish a `MembershipCreated` event:
+
+```javascript
+import { AWSEventBridgeBus } from "node-shared-libraries/dist/index.js";
+
+async function publishMembershipEvent(eventBusName: string) {
+  const region: string = process.env.AWS_REGION || "ap-southeast-2";
+
+  const eventBus = new AWSEventBridgeBus(eventBusName, region);
+
+  const membershipCreatedEvent = {
+    type: "MembershipCreated", // event handling type
+    source: "sera.membership", // source
+    data: {         // event data
+      user: "test@example.com",
+      id: "67890"
+    },
+  };
+
+  try {
+    // Publish the event
+    await eventBus.publish(membershipCreatedEvent);
+    console.log("Membership created event published successfully.");
+  } catch (error) {
+    console.error("Failed to publish membership created event:", error);
+  }
+}
+
+// pass name of event bus
+publishMembershipEvent('specific-event-bus').catch(console.error)
+```
+
+### Event Publishing
+- Ensure the AWS EventBridge event bus is properly configured.
+- The event type and source should match what listeners are expecting.
+- Handle errors gracefully to ensure reliability.
+
+---
+
 Let me know if you need any modifications! 🚀
